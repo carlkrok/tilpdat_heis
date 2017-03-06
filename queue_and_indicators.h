@@ -1,15 +1,12 @@
 
-#ifndef queue_and_indicators_h
-#define queue_and_indicators_h
+#pragma once
 
-int getDir(int currDir,int currFloor, int floorAllignement);
-int checkOrder(int currFloor,int currDir);
-void deleteOrder(int floor);
-void newOrder(int floor, int dir);
-int UP = 1;
-int DOWN = 0;
+int getDir(int (*orders)[4][2], int currDir,int currFloor, int floorAllignement);
+int checkOrder(int (*orders)[4][2], int currFloor,int currDir);
+void deleteOrder(int (*orders)[4][2], int floor);
+void newOrder(int (*orders)[4][2], int floor, int dir);
 
 
 
 
-#endif /* queue_and_indicators_h */
+

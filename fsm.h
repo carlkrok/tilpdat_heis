@@ -1,6 +1,5 @@
 
-#ifndef fsm_h
-#define fsm_h
+#pragma once
 
 #include <stdio.h>
 #include "queue_and_indicators.h"
@@ -8,6 +7,4 @@
 #include "eventmanager.h"
 
 
-int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int delayEvent);
-
-#endif /* fsm_h */
+int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int delayEvent, int (*orders)[4][2], int* currState);
