@@ -5,14 +5,14 @@
 #include "fsm.h"
 #include "eventmanager.h"
 
-int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int delayEvent) {
+int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int delayEvent, int (*orders)[4][2], int* currState) {
     
     
     
     
     if (stopEvent) {
         
-        switch(currState) {
+        switch(*currState) {
                 
                 
             case WAIT: {
@@ -26,14 +26,14 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
                 
             case ELEVATOR_ACTIVATOR: {
                 
-                currState = WAIT;
+                *currState = WAIT;
                 
             }
                 
             case DOOR_OPEN: {
                 
                 for (int floor = 0; floor < N_FLOORS; floor++) {
-                    deleteOrder(floor);
+                    deleteOrder(orders, floor);
                 }
                 
                 return 1;
@@ -59,11 +59,11 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
         
         fsmCurrFloor = floorEvent;
         
-        switch(currState) {
+        switch(*currState) {
                 
             case INITIALIZE: {
                 
-                currState = WAIT;
+                *currState = WAIT;
                 
             }
                 
@@ -87,8 +87,8 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
                 
             case TRANSPORTING: {
                 
-                if ( checkOrder(floorEvent, fsmCurrDir) || (getDir(fsmCurrDir, fsmCurrFloor, fsmFloorAlignment) != fsmCurrDir)) {
-                    deleteOrder(floorEvent);
+                if ( checkOrder(orders, floorEvent, fsmCurrDir) || (getDir(orders, fsmCurrDir, fsmCurrFloor, fsmFloorAlignment) != fsmCurrDir)) {
+                    deleteOrder(orders, floorEvent);
                     elev_set_door_open_lamp(1);
                     return 1;
                 }
@@ -102,7 +102,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
     else if (buttonFloor) {
         
         
-        switch(currState) {
+        switch(*currState) {
                 
             case STOP: {
                 
@@ -115,7 +115,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
                 
             case WAIT: {
                 
-                currState = ELEVATOR_ACTIVATOR;
+                *currState = ELEVATOR_ACTIVATOR;
             }
                 
             case ELEVATOR_ACTIVATOR: {
@@ -128,7 +128,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
                 
             case TRANSPORTING: {
                 
-                newOrder(buttonType, buttonFloor);
+                newOrder(orders, buttonType, buttonFloor);
             }
                 
         }
@@ -137,7 +137,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
     
     else if (delayEvent) {
         
-        switch (currState) {
+        switch (*currState) {
                 
             case INITIALIZE: {
                 
@@ -162,11 +162,11 @@ int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int
                 
             case DOOR_OPEN: {
                 
-                if (!checkOrder(fsmCurrFloor, fsmCurrDir)) {
+                if (!checkOrder(orders, fsmCurrFloor, fsmCurrDir)) {
                     elev_set_door_open_lamp(0);
-                    fsmCurrDir = getDir(fsmCurrDir, fsmCurrFloor, fsmFloorAlignment);
+                    fsmCurrDir = getDir(orders, fsmCurrDir, fsmCurrFloor, fsmFloorAlignment);
                     elev_set_motor_direction(fsmCurrDir);
-                    currState = TRANSPORTING;
+                    *currState = TRANSPORTING;
                 }
                 else return 1;
             }

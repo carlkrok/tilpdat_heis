@@ -1,8 +1,7 @@
 // Channel definitions for elevator control using LibComedi
 //
 // 2006, Martin Korsgaard
-#ifndef __INCLUDE_DRIVER_CHANNELS_H__
-#define __INCLUDE_DRIVER_CHANNELS_H__
+#pragma once
 
 //in port 4
 #define PORT4               3
@@ -59,4 +58,3 @@
 
 
 
-#endif //#ifndef __INCLUDE_DRIVER_CHANNELS_H__

@@ -1,11 +1,9 @@
 
-#ifndef eventmanager_h
-#define eventmanager_h
-
+#pragma once
 enum state {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING };
 int eventManager();
 
-int orders[N_FLOORS][2] = {0};
+
 
 /*
 for (int i = 0; i < N_FLOORS; i++) {
@@ -19,7 +17,6 @@ int fsmCurrFloor;
 int fsmFloorAlignment;
 int fsmCurrDir;
 
-enum state currState = INITIALIZE;
 
 
-#endif /* eventmanager_h */
+

@@ -2,8 +2,7 @@
 // These functions provides an interface to the elevators in the real time lab
 //
 // 2007, Martin Korsgaard
-#ifndef __INCLUDE_DRIVER_H__
-#define __INCLUDE_DRIVER_H__
+#pragma once
 
 
 // Number of floors
@@ -119,5 +118,3 @@ int elev_get_button_signal(elev_button_type_t button, int floor);
 void elev_set_button_lamp(elev_button_type_t button, int floor, int value);
 
 
-
-#endif // #ifndef __INCLUDE_DRIVER_H__
