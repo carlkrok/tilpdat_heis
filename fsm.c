@@ -5,175 +5,144 @@
 #include "fsm.h"
 #include "eventmanager.h"
 
-int newEvent(int stopEvent, int floorEvent, int buttonType, int buttonFloor, int delayEvent, int (*orders)[4][2], int* currState) {
-    
-    
+int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int buttonFloor, int delayEvent, int (*orders)[4][2], int* currState, int (*elevParam)[3]) {
     
     
     if (stopEvent) {
+
+	for (int floor = 0; floor < N_FLOORS; floor++) {
+                    deleteOrder(orders, floor);
+                }
         
-        switch(*currState) {
-                
-                
-            case WAIT: {
-                
-            }
-                
-            case TRANSPORTING: {
-                
+        switch(*currState) { 
+                            
+            case TRANSPORTING: { 
                 elev_set_motor_direction(DIRN_STOP);
             }
                 
             case ELEVATOR_ACTIVATOR: {
-                
                 *currState = WAIT;
                 
             }
                 
-            case DOOR_OPEN: {
+            case INITIALIZE: {
+	    }
+
+	    case WAIT: {  
+            }
                 
-                for (int floor = 0; floor < N_FLOORS; floor++) {
-                    deleteOrder(orders, floor);
-                }
-                
+            case STOP: { 
+                break;
+            }
+
+	    case DOOR_OPEN: {                  
                 return 1;
                 
             }
-                
-            case INITIALIZE: {
-                
-            }
-                
-            case STOP: {
-                
-                break;
-                
-            }
-                
-            }
-                
-        }
+
+            } //Switch   
+        } //StopEvent
     
     
     else if (floorEvent) {
         
-        fsmCurrFloor = floorEvent;
+        *elevParam[0] = floorEvent; //fsmCurrFloor
         
         switch(*currState) {
                 
             case INITIALIZE: {
-                
+                elev_set_motor_direction(DIRN_STOP);
                 *currState = WAIT;
-                
+		*elevParam[1] = 1; //floorAlignment
+		*elevParam[2] = 0; //currDir
             }
                 
             case WAIT: {
-                
             }
                 
             case ELEVATOR_ACTIVATOR: {
-                
             }
                 
             case DOOR_OPEN: {
-                
             }
                 
             case STOP: {
-                
                 break;
-                
             }
                 
             case TRANSPORTING: {
                 
-                if ( checkOrder(orders, floorEvent, fsmCurrDir) || (getDir(orders, fsmCurrDir, fsmCurrFloor, fsmFloorAlignment) != fsmCurrDir)) {
-                    deleteOrder(orders, floorEvent);
+                if ( checkOrder(orders, elevParam) || (getDir(orders, elevParam) != *elevParam[2])) {
+                    elev_set_motor_direction(DIRN_STOP);
+                    *currState = DOOR_OPEN;
+		    *elevParam[1] = 1; //floorAlignment
+		    deleteOrder(orders, elevParam);
                     elev_set_door_open_lamp(1);
                     return 1;
                 }
                 
-            }
-                
-        }
-        
-    }
+            }   
+        } //switch
+    } //floorEvent
     
-    else if (buttonFloor) {
-        
+    else if (buttonEvent) {
         
         switch(*currState) {
                 
             case STOP: {
-                
             }
                 
             case INITIALIZE: {
-                
                 break;
             }
                 
             case WAIT: {
-                
-                *currState = ELEVATOR_ACTIVATOR;
             }
                 
             case ELEVATOR_ACTIVATOR: {
-                
             }
                 
             case DOOR_OPEN: {
-                
             }
                 
             case TRANSPORTING: {
-                
-                newOrder(orders, buttonType, buttonFloor);
+                newOrder(orders, buttonFloor, buttonType);
             }
-                
-        }
-        
-    }
+        } //switch
+    } //buttonEvent
     
     else if (delayEvent) {
         
         switch (*currState) {
                 
             case INITIALIZE: {
-                
             }
                 
             case WAIT: {
-                
             }
                 
             case ELEVATOR_ACTIVATOR: {
-                
             }
                 
             case STOP: {
-                
             }
                 
             case TRANSPORTING: {
-                
                 break;
             }
                 
             case DOOR_OPEN: {
-                
-                if (!checkOrder(orders, fsmCurrFloor, fsmCurrDir)) {
+                if (!checkOrder(orders, elevParam)) {
                     elev_set_door_open_lamp(0);
-                    fsmCurrDir = getDir(orders, fsmCurrDir, fsmCurrFloor, fsmFloorAlignment);
-                    elev_set_motor_direction(fsmCurrDir);
+                    elevParam[2] = getDir(orders, elevParam); //set currDir
+                    elev_set_motor_direction(elevParam[2]); //drive in direction of currDir
                     *currState = TRANSPORTING;
                 }
-                else return 1;
+                else {return 1;}
             }
                 
-        }
-        
-    }
+        } //switch
+    } //delayEvent
     
     return 0;
     

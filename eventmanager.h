@@ -13,10 +13,6 @@ for (int i = 0; i < N_FLOORS; i++) {
 }
 */
 
-int fsmCurrFloor;
-int fsmFloorAlignment;
-int fsmCurrDir;
-
 
 
 
