@@ -29,12 +29,10 @@ int eventManager() {
 		  delayRequest = newEvent( 0, floorSensorSignal, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //floorSensorSignal
     		
-            for (int type = 0; type < 3; type++){
-                
+            for (int buttonType = 0; buttonType < 3; buttonType++){
 				for (int floor = 0; floor < N_FLOORS; floor++){
-                    
-					if (elev_get_button_signal(type, floor)){
-						delayRequest = newEvent( 0, 0, 1, type, floor, 0, &orders, &currState, &elevParam);
+					if (!((floor == 0 && buttonType == 1) || (floor == 3 && buttonType == 0)) && elev_get_button_signal(buttonType, floor)){
+						delayRequest = newEvent( 0, 0, 1, buttonType, floor, 0, &orders, &currState, &elevParam);
 					}
 				}
 			} //buttonSignal
