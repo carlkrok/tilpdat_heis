@@ -7,4 +7,4 @@
 #include "eventmanager.h"
 
 
-int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int buttonFloor, int delayEvent, int (*orders)[4][2], int* currState, int (*elevParam)[3]);
+int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int buttonFloor, int delayEvent, int (*orders)[4][2], state_t* currState, int (*elevParam)[3]);

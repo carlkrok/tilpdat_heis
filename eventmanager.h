@@ -1,6 +1,6 @@
 
 #pragma once
-typedef enum state {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING };
+typedef enum {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING } state_t;
 int eventManager();
 
 

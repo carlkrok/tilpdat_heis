@@ -13,26 +13,32 @@ int eventManager() {
     int floorSensorSignal;
     int delayRequest = 0;
 
-    enum state currState = INITIALIZE;
+    state_t currState = INITIALIZE;
+
+    printf("+++ State is now INITIALIZE. +++\n");
     
     int orders[N_FLOORS][2] = {0};
+    int elevParam[3] = {0, 0, 1};
 
-    int elevParam[3] = {0};
+    elev_set_motor_direction(1); //Initialize driving.
     
     while(1) {
             
     		if (elev_get_stop_signal()){
+                printf("Got a stop signal.\n");
     			delayRequest = newEvent( 1, 0, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //stopSignal
 
     		if ((floorSensorSignal = elev_get_floor_sensor_signal()) > -1){
-		  delayRequest = newEvent( 0, floorSensorSignal, 0, 0, 0, 0, &orders, &currState, &elevParam);
+                printf("Got a floor sensor signal.\n");
+                delayRequest = newEvent( 0, floorSensorSignal, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //floorSensorSignal
     		
             for (int buttonType = 0; buttonType < 3; buttonType++){
 				for (int floor = 0; floor < N_FLOORS; floor++){
 					if (!((floor == 0 && buttonType == 1) || (floor == 3 && buttonType == 0)) && elev_get_button_signal(buttonType, floor)){
-						delayRequest = newEvent( 0, 0, 1, buttonType, floor, 0, &orders, &currState, &elevParam);
+						printf("Got a button signal.\n");
+                        delayRequest = newEvent( 0, 0, 1, buttonType, floor, 0, &orders, &currState, &elevParam);
 					}
 				}
 			} //buttonSignal
@@ -43,12 +49,14 @@ int eventManager() {
                 if (!delayState) {
                     delayState = 1;
                     startTime = clock();
+                    printf("Starting timer.\n");
                 }
                 
                 clock_t timeDifference = clock() - startTime;
                 sec = timeDifference / CLOCKS_PER_SEC;
                 if (sec >= trigger) {
                     delayState = 0;
+                    printf("Timer reached trigger.\n");
                     delayRequest = newEvent(0, 0, 0, 0, 0, 1, &orders, &currState, &elevParam);
                 }
                 
