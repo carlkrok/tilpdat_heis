@@ -29,7 +29,7 @@ int eventManager() {
     			delayRequest = newEvent( 1, 0, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //stopSignal
 
-    		if (((floorSensorSignal = elev_get_floor_sensor_signal()) != -1) && !*elevParam[1]){
+    		if (((floorSensorSignal = elev_get_floor_sensor_signal()) != -1) && !(elevParam[1])){
                 printf("Got a floor sensor signal.\n");
                 delayRequest = newEvent( 0, floorSensorSignal, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //floorSensorSignal

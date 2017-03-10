@@ -82,16 +82,16 @@ void newOrder(int (*orders)[4][2], int floor, int type){
        		printf("          Called newOrder() for ");
         	
 		if (floor == 0) {
-		printf("1st floor.\n")
+		printf("1st floor.\n");
 		}
 		else if (floor == 1) {
-		printf("2nd floor.\n")
+		printf("2nd floor.\n");
 		}
 		else if (floor == 2) {
-		printf("3rd floor.\n")
+		printf("3rd floor.\n");
 		}	
 		else if (floor == 3) {
-		printf("4th floor.\n")
+		printf("4th floor.\n");
 		}				
     
 		if (type == 2) {
