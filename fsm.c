@@ -13,7 +13,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     printf("******** Current state is: ");
     printf(&state_names[this_state]);
 
-    	int milisec = 200; // length of time to sleep, in miliseconds
+    int milisec = 200; // length of time to sleep, in miliseconds
 	struct timespec req = {0};
 	req.tv_sec = 0;
 	req.tv_nsec = milisec * 1000000L;
@@ -21,7 +21,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     
     if (stopEvent) {
 
-    	printf("   Stop event received in FSM.\n");
+    printf("   Stop event received in FSM.\n");
 	elev_set_stop_lamp(1);
 	nanosleep(&req, (struct timespec *)NULL);
 	elev_set_stop_lamp(0);
@@ -42,18 +42,17 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
             }
                 
             case INITIALIZE: {
-	    }
+	    	}
 
-	    case WAIT: {  
+	    	case WAIT: {  
             }
                 
             case STOP: { 
                 break;
             }
 
-	    case DOOR_OPEN: {                  
+	    	case DOOR_OPEN: {                  
                 return 1;
-                
             }
 
             } //Switch   
@@ -65,7 +64,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     	printf("   Floor event received in FSM.\n");
         
         *elevParam[0] = floorEvent; //fsmCurrFloor
-	elev_set_floor_indicator(floorEvent);
+		elev_set_floor_indicator(floorEvent);
         
         switch(*currState) {
                 
@@ -94,8 +93,8 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
                 if ( checkOrder(orders, elevParam) || (getDir(orders, elevParam) != *elevParam[2])) {
                     elev_set_motor_direction(DIRN_STOP);
                     *currState = DOOR_OPEN;
-		    *elevParam[1] = 1; //floorAlignment
-		    deleteOrder(orders, *elevParam[0]);
+		    		*elevParam[1] = 1; //floorAlignment
+		    		deleteOrder(orders, *elevParam[0]);
                     elev_set_door_open_lamp(1);
                     return 1;
                 }
@@ -107,7 +106,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     else if (buttonEvent) {
 
     	printf("   Button event received in FSM.\n");
-	nanosleep(&req, (struct timespec *)NULL);	
+		nanosleep(&req, (struct timespec *)NULL);	
         
         switch(*currState) {
                 
@@ -126,7 +125,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
                 if(*elevParam[2]) {
                 	elev_set_motor_direction(*elevParam[2]); //drive in direction of currDir
                 	*currState = TRANSPORTING;
-			*elevParam[1] = 0;
+					*elevParam[1] = 0;
                 }
                 break;
             }
@@ -168,15 +167,19 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
                 
             case DOOR_OPEN: {
                 if (!checkOrder(orders, elevParam)) {
+                	printf("		Reached delay finished event.");
                     elev_set_door_open_lamp(0);
                     *elevParam[2] = getDir(orders, elevParam); //set currDir
-		    if(*elevParam[2]) {
-                    elev_set_motor_direction(*elevParam[2]); //drive in direction of currDir
-                    *currState = TRANSPORTING;
-		    *elevParam[1] = 0;
-		    }
+		    	
+		    		if(*elevParam[2]) {
+                    	elev_set_motor_direction(*elevParam[2]); //drive in direction of currDir
+                    	*currState = TRANSPORTING;
+		    			*elevParam[1] = 0;
+		    	}
+                } else {
+                	printf("		Timer reached trigger but restarted.");
+                	return 1;
                 }
-                else {return 1;}
             }
                 
         } //switch
