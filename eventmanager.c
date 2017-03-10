@@ -29,22 +29,24 @@ int eventManager() {
     			delayRequest = newEvent( 1, 0, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //stopSignal
 
-    		if ((floorSensorSignal = elev_get_floor_sensor_signal()) > -1){
+    		if (((floorSensorSignal = elev_get_floor_sensor_signal()) != -1) && !*elevParam[1]){
                 printf("Got a floor sensor signal.\n");
                 delayRequest = newEvent( 0, floorSensorSignal, 0, 0, 0, 0, &orders, &currState, &elevParam);
     		} //floorSensorSignal
     		
-            for (int buttonType = 0; buttonType < 3; buttonType++){
+           	for (int buttonType = 0; buttonType < 3; buttonType++){
 				for (int floor = 0; floor < N_FLOORS; floor++){
 					if (!((floor == 0 && buttonType == 1) || (floor == 3 && buttonType == 0)) && elev_get_button_signal(buttonType, floor)){
 						printf("Got a button signal.\n");
-                        delayRequest = newEvent( 0, 0, 1, buttonType, floor, 0, &orders, &currState, &elevParam);
+                        			delayRequest = newEvent( 0, 0, 1, buttonType, floor, 0, &orders, &currState, &elevParam);
 					}
 				}
 			} //buttonSignal
         
         
             if (delayRequest) {
+
+		printf("----------------------\nReceived a delay request!\n");
                 
                 if (!delayState) {
                     delayState = 1;
@@ -56,7 +58,7 @@ int eventManager() {
                 sec = timeDifference / CLOCKS_PER_SEC;
                 if (sec >= trigger) {
                     delayState = 0;
-                    printf("Timer reached trigger.\n");
+                    printf("----------------------\nTimer reached trigger.\n");
                     delayRequest = newEvent(0, 0, 0, 0, 0, 1, &orders, &currState, &elevParam);
                 }
                 
