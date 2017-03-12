@@ -10,6 +10,9 @@ int main() {
         printf("Unable to initialize elevator hardware!\n");
         return 1;
     }
+    else {
+    	printf("Initialization complete.\n");
+    }
     
     eventManager();
     

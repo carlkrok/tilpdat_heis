@@ -5,7 +5,7 @@ CC = clang-3.6
 CFLAGS = -g -Wall
 
 # Linker flags go here.
-LDFLAGS = -lcomedi -lm
+LDFLAGS = -lcomedi -lm -g
 
 # list of sources
 ELEVSRC = elev.c io.c main.c eventmanager.c fsm.c queue_and_indicators.c 
