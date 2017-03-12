@@ -1,7 +1,8 @@
 
 #pragma once
-enum state {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING };
+typedef enum {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING } state_t;
 int eventManager();
+void debugger(int tall, int* oldCode);
 
 
 
@@ -12,10 +13,6 @@ for (int i = 0; i < N_FLOORS; i++) {
       }
 }
 */
-
-int fsmCurrFloor;
-int fsmFloorAlignment;
-int fsmCurrDir;
 
 
 
