@@ -171,7 +171,9 @@ int eventManager() {
                 if ((floorSensorSignal = elev_get_floor_sensor_signal()) != -1) {
                     //12printf("Got a floor sensor signal.\n");
                     //debugger(12, &prevDebug);
-                    delayRequest += newEvent( 0, floorSensorSignal, 0, 0, 0, 0, orders, &currState, elevParam, &prevDebug);
+                    
+
+			delayRequest += newEvent( 0, floorSensorSignal+1, 0, 0, 0, 0, orders, &currState, elevParam, &prevDebug);
         		} //floorSensorSignal
         		
                	for (int buttonType = 0; buttonType < 3; buttonType++){

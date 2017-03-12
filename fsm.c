@@ -68,6 +68,8 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     
     else if (floorEvent) {
 
+	floorEvent -= 1;
+
     	//3printf("   Floor event received in FSM.\n");
         //printf(*prevDebug,'\n','\n');
         debugger(3, prevDebug);
