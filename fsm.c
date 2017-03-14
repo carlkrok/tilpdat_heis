@@ -22,6 +22,9 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
 
     //2printf("   Stop event received in FSM.\n");
     debugger(2, prevDebug);
+    if(!elevParam[1]){
+        elevParam[2] = elevParam[3];
+    }
 	elev_set_stop_lamp(1);
 	nanosleep(&req, (struct timespec *)NULL);
 	elev_set_stop_lamp(0);
@@ -68,12 +71,14 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     
     else if (floorEvent) {
 
+	floorEvent -= 1;
+
     	//3printf("   Floor event received in FSM.\n");
         //printf(*prevDebug,'\n','\n');
         debugger(3, prevDebug);
 
         nanosleep(&req, (struct timespec *)NULL);
-        printf("Floorevent = %i \n", floorEvent);
+        //printf("Floorevent = %i \n", floorEvent);
         
         elevParam[0] = floorEvent; //fsmCurrFloor
 		elev_set_floor_indicator(floorEvent);
@@ -117,6 +122,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
     } //floorEvent
     
     else if (buttonEvent) {
+        //printf("ButtonFloor er  %i \n", buttonFloor);
 
     	//4printf("   Button event received in FSM.\n");
         debugger(4, prevDebug);
@@ -134,6 +140,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
             }
                 
             case WAIT: {
+                printf("ButtonFloor er i Wait %i \n", buttonFloor);
             	//6printf("--> Calling newOrder from WAIT state.\n");
                 debugger(6, prevDebug);
                 newOrder(orders, buttonFloor, buttonType, prevDebug);
@@ -141,7 +148,16 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
                 if(elevParam[2]) {
                 	elev_set_motor_direction(elevParam[2]); //drive in direction of currDir
                 	*currState = TRANSPORTING;
-					elevParam[1] = 0;
+                    if(elevParam[1]){
+                        elevParam[3] = elevParam[2];
+                    }
+                    elevParam[1] = 0;
+                   
+                }
+                else if(checkOrder(orders, elevParam, prevDebug)) {
+                    elev_set_door_open_lamp(1);
+                    deleteOrder(orders, elevParam[0], prevDebug);
+                    return 1;
                 }
                 break;
             }
@@ -150,6 +166,35 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
             }
                 
             case DOOR_OPEN: {
+                printf("ButtonFloor er i Door Open %i \n", buttonFloor);
+                if(buttonFloor != elevParam[0]){
+                    newOrder(orders, buttonFloor, buttonType, prevDebug);
+
+
+                }
+                else{
+                    elev_set_door_open_lamp(1);
+                    return 1; 
+                }
+
+
+                 /*newOrder(orders, buttonFloor, buttonType, prevDebug);
+                 if(checkOrder(orders, elevParam, prevDebug)) {
+                    elev_set_door_open_lamp(1);
+                    deleteOrder(orders, elevParam[0], prevDebug);
+                    return 1;
+                }*/
+
+
+                 /*
+                 elevParam[2] = getDir(orders, elevParam, prevDebug); //set currDir
+                if(!elevParam[2]) {
+                    elev_set_door_open_lamp(1);
+                    deleteOrder(orders, elevParam[0], prevDebug);
+                    return 1;
+                }
+                */
+                break;
             }
                 
             case TRANSPORTING: {
@@ -182,6 +227,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
             }
 
             case WAIT: {
+
             }
                 
             case DOOR_OPEN: {
@@ -199,6 +245,7 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
 
                 if (!stayInFloor) {
                 	//9printf("		Reached delay finished event.");
+                    deleteOrder(orders, elevParam[0], prevDebug);
                     debugger(9, prevDebug);
                     elev_set_door_open_lamp(0);
                     elevParam[2] = getDir(orders, elevParam, prevDebug); //set currDir
@@ -207,11 +254,16 @@ int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int
 		    		if(elevParam[2]) {
                     	elev_set_motor_direction(elevParam[2]); //drive in direction of currDir
                     	*currState = TRANSPORTING;
-		    			elevParam[1] = 0;
+                        if(elevParam[1]){
+                            elevParam[3] = elevParam[2];
+                        }
+                        elevParam[1] = 0;
+
 		    	}
                 } else {
                 	//10printf("		Timer reached trigger but restarted.");
                     debugger(10, prevDebug);
+                    elev_set_door_open_lamp(1);
                     deleteOrder(orders, elevParam[0], prevDebug);
                 	return 1;
                     //a[b] = a + *(sizeof(int) * b)

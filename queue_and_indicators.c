@@ -22,6 +22,7 @@ int getDir(int orders[4][2], int elevParam[], int* prevDebug) {
                     }
                 }
                 printf("\n");
+
     if(currDir != 0) {
 
 
@@ -53,6 +54,7 @@ int getDir(int orders[4][2], int elevParam[], int* prevDebug) {
             debugger(17, prevDebug);
         	return 0;
     	} else { //If not alligned with floor /////wut=**********************************************************
+        	printf("Hallo  -------------  getDir - ikke floorAllignment");
         	for (int floor = currFloor ; (floor < N_FLOORS) && (floor >= 0); floor -= currDir) {
             		if (orders[floor][0] || orders[floor][1] ) {
                 	   //18printf("RETURNED -currDir.\n");
@@ -64,7 +66,7 @@ int getDir(int orders[4][2], int elevParam[], int* prevDebug) {
         }
     }
 
-        for (int floor = currFloor; (floor < N_FLOORS) && (floor >= 0); floor++) {
+        for (int floor = currFloor + currDir; (floor < N_FLOORS) && (floor >= 0); floor++) {
             	if (orders[floor][0] || orders[floor][1] ) {
                 	//19printf("RETURNED 1.\n");
                     debugger(19, prevDebug);
@@ -122,7 +124,8 @@ void deleteOrder(int orders[4][2], int floor, int* prevDebug){
         	//27printf("          Called deleteOrder().\n");
             debugger(27, prevDebug);
     
- 			orders[floor][0] = orders[floor][1] = 0;
+ 			orders[floor][0] = 0;
+ 			orders[floor][1] = 0;
 
             elev_set_button_lamp(2, floor, 0);
 

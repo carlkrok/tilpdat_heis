@@ -147,12 +147,11 @@ int eventManager() {
                     }
                 }
                 printf("\n");
-    int elevParam[3] = {0, 0, -1};
+    int elevParam[4] = {0, 0, -1, 0};
 
     elev_set_motor_direction(-1); //Initialize driving.
 
     int prevDebug = 0;
-    
     while(!elev_get_obstruction_signal()) {
 
             char state_names[8] = {'I', 'W', 'E', 'D', 'S', 'T', '\n', '\0'};
@@ -171,7 +170,9 @@ int eventManager() {
                 if ((floorSensorSignal = elev_get_floor_sensor_signal()) != -1) {
                     //12printf("Got a floor sensor signal.\n");
                     //debugger(12, &prevDebug);
-                    delayRequest += newEvent( 0, floorSensorSignal, 0, 0, 0, 0, orders, &currState, elevParam, &prevDebug);
+                    
+
+			delayRequest += newEvent( 0, floorSensorSignal+1, 0, 0, 0, 0, orders, &currState, elevParam, &prevDebug);
         		} //floorSensorSignal
         		
                	for (int buttonType = 0; buttonType < 3; buttonType++){
