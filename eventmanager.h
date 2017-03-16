@@ -1,18 +1,10 @@
 
 #pragma once
-typedef enum {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING } state_t;
-int eventManager();
-void debugger(int tall, int* oldCode);
+
+typedef enum {INITIALIZE, WAIT, ELEVATOR_ACTIVATOR, DOOR_OPEN, STOP, TRANSPORTING } state_t; //Current state is initialized in event manager, but only used in the state machine wich takes the variable's adress as an argument. 
 
 
-
-/*
-for (int i = 0; i < N_FLOORS; i++) {
-  for (int j = 0; j < 2; j++){
-    orders[i][j] = 0;
-      }
-}
-*/
+int eventManager(); //The event manager polls the parameters of the elevator and calls the state machine in case of events. 
 
 
 

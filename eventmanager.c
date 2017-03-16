@@ -5,197 +5,58 @@
 #include "fsm.h"
 #include <time.h>
 
-state_t currState;
-
-void debugger(int debugTall, int* prevDebug){
-    
-    if (debugTall != *prevDebug){
-        int tall = debugTall;
-        *prevDebug = debugTall;
-        //*prevDebug = debugTall;
-
-        //char printDebugCode[4] = {debugTall, tall, '\n', '\0'};
-        //printf(&printDebugCode);
-
-        
-        if (tall == 1){
-        //printf("******** Current state is: ");
-        //printf(&state_names[this_state]);
-
-        }
-        else if (tall == 2){
-            printf("   Stop event received in FSM.\n"); 
-        }
-        else if (tall == 3){
-            printf("   Floor event received in FSM.\n");
-        }
-        else if (tall == 4){
-            printf("   Button event received in FSM.\n");
-        }
-        else if (tall == 5){
-            printf("--> Initialize state does nothing with button events.\n");
-        }
-        else if (tall == 6){
-            printf("--> Calling newOrder from WAIT state.\n");
-        }
-        else if (tall == 7){
-            printf("--> Calling newOrder.\n");
-        }
-        else if (tall == 8){
-            printf("   Delay event received in FSM.\n");
-        }
-        else if (tall == 9){
-            printf("        Reached delay finished event. \n");
-        }
-        else if (tall == 11){
-            printf("Got a stop signal.\n");
-        }
-        else if (tall == 12){
-            printf("Got a floor sensor signal.\n");
-        }
-        else if (tall == 13){
-            printf("Got a button signal.\n");
-        }
-        else if (tall == 14){
-            printf("          Called getDir().\n");
-        }
-        else if (tall == 15){
-            printf("RETURNED currDir.\n");
-        }
-        else if (tall == 16){
-            printf("RETURNED -currDir.\n");
-        }
-        else if (tall == 17){
-            printf("RETURNED 0.\n");
-        }
-        else if (tall == 18){
-            printf("RETURNED -currDir.\n");
-        }
-        else if (tall == 19){
-            printf("RETURNED 1.\n");
-        }
-        else if (tall == 20){
-            printf("RETURNED 0.\n");
-        }
-        else if (tall == 21){
-            printf("------>  Ended up returning 0 \n");
-        }
-        else if (tall == 22){
-            printf("          Called checkOrder().\n");
-        }
-        else if (tall == 23){
-            printf("RETURNED 1.\n");
-        }
-        else  if (tall == 24){
-            printf("RETURNED 1.\n");
-        }
-        else if (tall == 25){
-            printf("RETURNED 1.\n");
-        }
-        else if (tall == 26){
-            printf("RETURNED 0.\n");
-        }
-        else if (tall == 27){
-            printf("          Called deleteOrder().\n");
-        }
-        else  if (tall == 28){
-            printf("          Called newOrder() for ");
-        }
-        else if (tall == 29){
-            printf("1st floor.\n");
-        }
-        else if (tall == 30){
-            printf("2nd floor.\n");
-        }
-        else if (tall == 31){
-            printf("3rd floor.\n");
-        }
-        else if (tall == 32){
-            printf("4th floor.\n");
-        }
-        else if (tall == 33) {
-            printf("----------------------\nReceived a delay request!\n");
-        }
-    }
-
-}
-
 
 int eventManager() {
-    int msec = 0, trigger = 300, delayState = 0;
-    clock_t startTime;
-
-    int floorSensorSignal;
-    int delayRequest = 0;
 
     state_t currState = INITIALIZE;
 
-    printf("+++ State is now INITIALIZE. +++\n");
+    int msec = 0, trigger = 300, delayState = 0, delayRequest = 0; //Event manager holds the timer-function of the elevator. 
+    clock_t startTime;    
     
-    int orders[N_FLOORS][2] = {{0,0},{0,0},{0,0},{0,0}};
-     for (int etasje = 0; etasje < 4; etasje++){
-                for (int i = 0; i < 2; i++){
-                    orders[etasje][i] = 0;
+    int orders[N_FLOORS][2]};
+    for (int i = 0; i < N_FLOORS; i++){
+                for (int j = 0; j < 2; j++){
+                    orders[i][j] = 0;
                 }
-            }
+    }
 
-    printf("Dette er  før start:");
-    for (int etasje = 0; etasje < 4; etasje++){
-                    printf("\n");
-                    for (int i = 0; i < 2; i++){
-                        printf("\t%i", orders[etasje][i]);
-                    }
-                }
-                printf("\n");
-    int elevParam[4] = {0, 0, -1, 0};
+    int elevParam[4] = {0, 0, -1, 0}; //List to hold the parameters of the elevator (current floor, alligned with floor, current direction, last "secure" direction used in STOP evetn).
 
-    elev_set_motor_direction(-1); //Initialize driving.
+    elev_set_motor_direction(-1); //Initialize state.
 
-    int prevDebug = 0;
     while(!elev_get_obstruction_signal()) {
 
-            char state_names[8] = {'I', 'W', 'E', 'D', 'S', 'T', '\n', '\0'};
-            int this_state = currState;
-            //printf("******** Current state is:"); 
-            //printf(&state_names[this_state]);
-            
+		
+                //Stop event has prioritation over the other events. It calls the state machine with a stop event, delayrequest is added 1 if the timer is required.          
     		if (elev_get_stop_signal()){
-                //11printf("Got a stop signal.\n");
-                //debugger(11, &prevDebug);
-    			delayRequest += newEvent( 1, 0, 0, 0, 0, 0, orders, &currState, elevParam, &prevDebug);
-    		} //stopSignal
+                    			delayRequest += newEvent( 1, 0, 0, 0, 0, 0, orders, &currState, elevParam); 
+    		} 
 
-            else {
-        		
-                if ((floorSensorSignal = elev_get_floor_sensor_signal()) != -1) {
-                    //12printf("Got a floor sensor signal.\n");
-                    //debugger(12, &prevDebug);
-                    
+                else { //No stop event. 
 
-			delayRequest += newEvent( 0, floorSensorSignal+1, 0, 0, 0, 0, orders, &currState, elevParam, &prevDebug);
-        		} //floorSensorSignal
+		int floorSensorSignal = elev_get_floor_sensor_signal();
         		
-               	for (int buttonType = 0; buttonType < 3; buttonType++){
-    				for (int floor = 0; floor < N_FLOORS; floor++){
-    					if (!((floor == 0 && buttonType == 1) || (floor == 3 && buttonType == 0)) && elev_get_button_signal(buttonType, floor)){
-    						//13printf("Got a button signal.\n");
-                            //debugger(13, &prevDebug);
-                            delayRequest += newEvent( 0, 0, 1, buttonType, floor, 0, orders, &currState, elevParam, &prevDebug);
-    					}
+                if (floorSensorSignal != -1) {
+
+			delayRequest += newEvent( 0, floorSensorSignal+1, 0, 0, 0, 0, orders, &currState, elevParam); //The floor event is passed with +1 so it can easily be detected in the state machine.
+
+        	}//End of floor sensor poll.
+        		
+               	for (int buttonPollType = 0; buttonPollType < 3; buttonPollType++){
+    			for (int buttonPollFloor = 0; buttonPollFloor < N_FLOORS; buttonPollFloor++){
+    				if (!((buttonPollFloor == 0 && buttonPollType == 1) || (buttonPollFloor == 3 && buttonPollType == 0)) && elev_get_button_signal(buttonPollType, buttonPollFloor)){ //Polls the buttons on the elevator, avoids undefined buttons (down from 1st floor etc).
+					delayRequest += newEvent( 0, 0, 1, buttonPollType, buttonPollFloor, 0, orders, &currState, elevParam);
     				}
-    			} //buttonSignal
+    			}
+    		} //End of button polling.
             
-            }//If no stop signal
+            }//End of no stop signal procedure.
 
-            if (delayRequest || delayState) {
-
-		        //33printf("----------------------\nReceived a delay request!\n");
-                //debugger(33, &prevDebug);
+            if (delayRequest || delayIsActive) { //Timer function being called if timer is active (delayIsActive) or requested (delayRequest). 
 
                 if (delayRequest) {
                     startTime = clock();
-                    delayState = 1;
-                    printf("Starting timer.\n");
+                    delayIsActive = 1;
                     delayRequest = 0;
                 }
 
@@ -203,17 +64,16 @@ int eventManager() {
                 msec = timeDifference * 1000 / CLOCKS_PER_SEC;
 
                 if (msec >= trigger) {
-                    delayState = 0;
-                    delayRequest = newEvent(0, 0, 0, 0, 0, 1, orders, &currState, elevParam, &prevDebug);
-                    printf("----------------------\nTimer reached trigger.\n");
+                    delayIsActive = 0;
+                    delayRequest = newEvent(0, 0, 0, 0, 0, 1, orders, &currState, elevParam); //When timer reaches the trigger it passes a delay event to the state machine. 
                 }
-            }
+            } //End of timer procedure. 
 
 
 
             
 			
-    } //while 1
+    } //End of while !elev_get_obstruction_signal() procedure.
 
     return 0;
 }
