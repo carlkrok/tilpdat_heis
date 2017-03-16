@@ -1,12 +1,12 @@
 
 #pragma once
-
-#include <stdio.h>
 #include "queue_and_indicators.h"
-#include "elev.h"
 #include "eventmanager.h"
 
 
-int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int buttonFloor, int delayEvent, int orders[4][2], state_t* currState, int elevParam[], int* prevDebug);
+//State machine that decides what should happen when the eventmanager sends an event.
+int newEvent(int stopEvent, int floorEvent, int buttonEvent, int buttonType, int buttonFloor, int delayEvent, int orders[4][2], state_t* currState, int elevParam[]);
 
+//Returns 1 if the elevator should stop at a floor. Otherwise 0.  
+int checkStop(int orders[4][2], int elevParam[4]);
 

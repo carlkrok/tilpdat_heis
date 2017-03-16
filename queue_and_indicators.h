@@ -11,9 +11,11 @@ int checkOrder(int orders[4][2], int elevParam[]);
 //Deletes all orders on the floor sent as an argument. 
 void deleteOrder(int orders[4][2], int floor);
 
-//Inserts the order given with orderFloor and orderDir in the matrix orders[][].
-void newOrder(int orders[4][2], int orderFloor, int orderDdir);
+//Inserts the order given with orderFloor and orderType in the matrix orders[][].
+void setOrder(int orders[4][2], int orderFloor, int orderType);
 
+#define OrderUp 0
+#define OrderDown 1
 
 
 

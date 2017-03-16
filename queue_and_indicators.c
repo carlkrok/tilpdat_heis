@@ -11,44 +11,52 @@ int getDir(int orders[4][2], int elevParam[]) {
     int floorAllignment = elevParam[1];
     int currDir = elevParam[2]; 
 
-    if(currDir != 0) { //Current direction is prioritized. 
+    //Current direction is prioritized. 
+    if(currDir != DIRN_STOP) { 
 
+        //Checks if there is any orders beyond current floor in current direction
     	for (int floor = (currFloor + currDir); (floor < N_FLOORS) && (floor >= 0); floor += currDir) {
         	
-            if (orders[floor][0] || orders[floor][1] ) { 
+            if (orders[floor][OrderUp] || orders[floor][OrderDown] ) { 
             		return currDir;
             	}
         }
     
-         
+        
     	if (floorAllignment) {
         	for (int floor = (currFloor - currDir); (floor < N_FLOORS) && (floor >= 0); floor -= currDir) {
-            		if (orders[floor][0] || orders[floor][1] ) {
+            		if (orders[floor][OrderUp] || orders[floor][OrderDown] ) {
                 		return -currDir;
             		}
         	}
                	return 0;
 
-    	} else { //If not alligned with floor      
+    	} 
+        //If elevator has stopped between floors
+        else {     
         	for (int floor = currFloor ; (floor < N_FLOORS) && (floor >= 0); floor -= currDir) {
-            		if (orders[floor][0] || orders[floor][1] ) {
+            		if (orders[floor][OrderUp] || orders[floor][OrderDown] ) {
                          	return -currDir;
             		}
         	}
         }
-    } else {//End of current direction prioritation procedure. 
+        
+    }
+
+    //If there is no current direction.
+    else {
 
 	//Checks for orders above the current floor.
-        for (int floor = currFloor; (floor < N_FLOORS) && (floor >= 0); floor++) {
-            	if (orders[floor][0] || orders[floor][1] ) {
-                	return 1;
+        for (int floor = currFloor + 1; (floor < N_FLOORS) && (floor >= 0); floor++) {
+            	if (orders[floor][OrderUp] || orders[floor][OrderDown] ) {
+                	return DIRN_UP;
                 }
         }
 
 	//Checks for orders below the current floor.
-        for (int floor = currFloor; (floor < N_FLOORS) && (floor >= 0); floor--) {
-            	if (orders[floor][0] || orders[floor][1] ) {
-                	return -1;       
+        for (int floor = currFloor - 1; (floor < N_FLOORS) && (floor >= 0); floor--) {
+            	if (orders[floor][OrderUp] || orders[floor][OrderDown] ) {
+                	return DIRN_DOWN;       
     		}
     	}
     }
@@ -59,19 +67,19 @@ int getDir(int orders[4][2], int elevParam[]) {
 int checkOrder(int orders[4][2], int elevParam[]) {
 
 	//For better readibility.
-    	int currFloor = elevParam[0]; 
+    int currFloor = elevParam[0]; 
 	int currDir = elevParam[2];
 
 	/*Follorwing code checks if there is an order in the same direction as the elevator.*/
-        if (currDir == 1 && orders[currFloor][0]) {
+        if (currDir == DIRN_UP && orders[currFloor][OrderUp]) {
             return 1;
 	}
                    
-        if (currDir == -1 && orders[currFloor][1]) {
+        if (currDir == DIRN_DOWN && orders[currFloor][OrderDown]) {
             return 1;
 	}
         
-        if (currDir == 0 && (orders[currFloor][1] || orders[currFloor][0])) {
+        if (currDir == DIRN_STOP && (orders[currFloor][OrderUp] || orders[currFloor][OrderDown])) {
             return 1;
 	}
         
@@ -80,31 +88,31 @@ int checkOrder(int orders[4][2], int elevParam[]) {
 
 void deleteOrder(int orders[4][2], int floor){
 	
-	orders[floor][0] = 0;
-	orders[floor][1] = 0;
+	orders[floor][OrderUp] = 0;
+	orders[floor][OrderDown] = 0;
 
 	/*Following code turns off the relevant button lights*/
 	elev_set_button_lamp(2, floor, 0);
 
-	if (!(floor == 0)){
+	if (floor != 0){
 		elev_set_button_lamp(1 , floor, 0);
 	}
-	if (!(floor == 3)){
+	if (floor != 3){
 		elev_set_button_lamp(0 , floor, 0);
 	}
             
             
 }
 
-void newOrder(int orders[4][2], int floor, int type){	
+void setOrder(int orders[4][2], int orderFloor, int orderType){	
 
-        elev_set_button_lamp(type, floor, 1);
+        elev_set_button_lamp(orderType, orderFloor, 1);
 
-	if (type == 2) {
-		orders[floor][0] = 1;
-		orders[floor][1] = 1;
+	if (orderType == BUTTON_COMMAND) {
+		orders[orderFloor][OrderUp] = 1;
+		orders[orderFloor][OrderDown] = 1;
 	} else {
-		orders[floor][type] = 1;
+		orders[orderFloor][orderType] = 1;
 	}
 
 }

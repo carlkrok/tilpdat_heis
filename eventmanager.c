@@ -10,10 +10,11 @@ int eventManager() {
 
     state_t currState = INITIALIZE;
 
-    int msec = 0, trigger = 300, delayState = 0, delayRequest = 0; //Event manager holds the timer-function of the elevator. 
+    int msec = 0, trigger = 300, delayIsActive = 0, delayRequest = 0; //Event manager holds the timer-function of the elevator. 
     clock_t startTime;    
     
-    int orders[N_FLOORS][2]};
+    int orders[N_FLOORS][2];
+
     for (int i = 0; i < N_FLOORS; i++){
                 for (int j = 0; j < 2; j++){
                     orders[i][j] = 0;
@@ -22,7 +23,7 @@ int eventManager() {
 
     int elevParam[4] = {0, 0, -1, 0}; //List to hold the parameters of the elevator (current floor, alligned with floor, current direction, last "secure" direction used in STOP evetn).
 
-    elev_set_motor_direction(-1); //Initialize state.
+    elev_set_motor_direction(DIRN_DOWN); //Initialize state.
 
     while(!elev_get_obstruction_signal()) {
 
